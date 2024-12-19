@@ -5,11 +5,8 @@ import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import useLoanContract from '@/lib/hooks/useLoanContract'
 
-const DUMMY_REQUESTED_LOANS = [
-  { id: 1, type: 'Personal', amount: 2000, status: 'Pending', description: 'Home repairs', interestRate: 5 },
-  { id: 2, type: 'Business', amount: 5000, status: 'Approved', description: 'Inventory purchase', interestRate: 7 },
-]
 
 const DUMMY_BIDS = [
   { id: 1, loanType: 'Student', amount: 1500, status: 'Active', borrower: 'Alice Johnson', interestRate: 4 },
@@ -23,6 +20,7 @@ const DUMMY_TRANSACTIONS = [
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview')
+  const {userLoanData} = useLoanContract();
 
   console.log(activeTab)
 
@@ -36,10 +34,10 @@ export default function Dashboard() {
       <h1 className="text-4xl font-bold mb-6">Dashboard</h1>
       <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="requested-loans">Requested Loans</TabsTrigger>
+          {/* <TabsTrigger value="overview">Overview</TabsTrigger> */}
+          {/* {/* <TabsTrigger value="requested-loans">Requested Loans</TabsTrigger> */}
           <TabsTrigger value="my-bids">My Bids</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
+          {/* <TabsTrigger value="transactions">Transactions</TabsTrigger>  */}
         </TabsList>
 
         <TabsContent value="overview">
@@ -73,16 +71,14 @@ export default function Dashboard() {
 
         <TabsContent value="requested-loans">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DUMMY_REQUESTED_LOANS.map((loan) => (
-              <Card key={loan.id}>
+            {userLoanData.map((loan ,index) => (
+              <Card key={Number(index)}>
                 <CardHeader>
-                  <CardTitle>{loan.type} Loan</CardTitle>
-                  <CardDescription>${loan.amount}</CardDescription>
+                  <CardTitle>{loan.description} Loan</CardTitle>
+                  <CardDescription>${Number(loan.amount)}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Badge className="mb-2">{loan.status}</Badge>
-                  <p className="text-sm mb-2">{loan.description}</p>
-                  <p className="text-sm">Interest Rate: {loan.interestRate}%</p>
+                  {loan.typeOfLoan == 0 ? "business" : loan.typeOfLoan == 1 ? "student" : "personal"}
                 </CardContent>
               </Card>
             ))}

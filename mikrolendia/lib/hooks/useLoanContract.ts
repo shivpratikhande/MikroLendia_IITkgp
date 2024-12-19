@@ -3,14 +3,17 @@ import { ethers } from 'ethers';
 import { getLoanContract } from '../contract/contract';
 import { toast } from 'sonner';
 import { Loan, LoanType } from '@/types/type';
+import { useAppSelector } from './useAppSelector';
 
 
 const useLoanContract = () => {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [loanData, setLoanData] = useState<Loan[]>([]);
+  const [userLoanData, setUserLoanData] = useState<Loan[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [creatingLoan, setCreatingLoan] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { walletAddress } = useAppSelector((state) => state.wallet)
 
   useEffect(() => {
     const initProvider = async () => {
@@ -58,13 +61,46 @@ const useLoanContract = () => {
     }
   }, [provider]);
 
+  const fetchUserAllLoans = useCallback(async () => {
+    if (!provider) return;
+    console.log('yayay')
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const contract = getLoanContract(provider);
+      console.log(contract)
+      console.log(walletAddress)
+      const loans = await contract.getUserRequestedLoans(walletAddress);
+      console.log(loans)
+      const loanCount=loans.length
+      console.log(loanCount)
+      console.log(loans)
+      setUserLoanData(loans);
+      console.log('Fetched all user loans:', loans);
+    } catch (err: unknown) {
+      console.log(err)
+      if (err instanceof Error) {
+        console.error('Error fetching user loans:', err.message);
+        setError('Failed to fetch user loan data');
+      } else {
+        console.error('Unknown error fetching user loans', err);
+        setError('An unexpected error occurred');
+      }
+      toast.error('An error occurred while fetching the user loans.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [provider, walletAddress]);
+
 
   useEffect(() => {
     if (provider) {
       console.log("fetching")
       fetchAllLoans();
+      fetchUserAllLoans();
     }
-  }, [fetchAllLoans, provider]); 
+  }, [fetchAllLoans, fetchUserAllLoans,provider]); 
 
 
   const requestLoan = async (
@@ -169,6 +205,7 @@ const useLoanContract = () => {
     loanData,
     isLoading,
     creatingLoan,
+    userLoanData,
     requestLoan,
     approveLoan,
     repayLoan,
