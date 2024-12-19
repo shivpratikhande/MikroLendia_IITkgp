@@ -7,6 +7,7 @@ import { FooterOverlay } from '@/components/footer-overlay'
 import '@/styles/globals.css'
 import { Provider } from 'react-redux'
 import store from '@/lib/store/store'
+import {Toaster} from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,6 +30,7 @@ export default function RootLayout({
               <NavbarWrapper />
               <main className="flex-grow container mx-auto px-4 py-8">
                 {children}
+                <Toaster />
               </main>
               <FooterOverlay />
             </div>

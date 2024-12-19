@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import { toast } from 'sonner'
 
 interface NavbarProps {
   connectWallet: () => Promise<void>
@@ -40,13 +41,20 @@ export function Navbar({
   if (!mounted) return null
 
   const handleConnect = async () => {
-    await connectWallet()  
-    setIsConnected(true)   
+    try {
+      await connectWallet()
+      setIsConnected(true)
+      toast.success('Successfully connected to your wallet!')
+    } catch (err) {
+      toast.error('Error connecting to wallet. Please try again.')
+      console.log(err)
+    }
   }
 
   const handleDisconnect = () => {
-    disconnectWalletHandler() 
-    setIsConnected(false)     
+    disconnectWalletHandler()
+    setIsConnected(false)
+    toast.success('Successfully disconnected from your wallet!')
   }
 
   return (
