@@ -15,19 +15,44 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
+import { toast } from 'sonner'
+import useLoanContract from '@/lib/hooks/useLoanContract'
+
 export default function RequestLoan() {
   const router = useRouter()
-  const [loanType, setLoanType] = useState('')
-  const [amount, setAmount] = useState('')
-  const [description, setDescription] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically send the loan request to your backend
-    console.log({ loanType, amount, description })
-    // Redirect to the bidding page after submission
-    router.push('/bidding')
-  }
+  const [loanType, setLoanType] = useState('');
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [duration, setDuration] = useState('');
+
+  const { requestLoan, creatingLoan } = useLoanContract();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!loanType || !amount || !description || !duration) {
+      toast.error('Please fill in all the fields.');
+      return;
+    }
+
+    try {
+      const loanEnum = loanType === 'personal' ? 0 : loanType === 'business' ? 1 : 2;
+      
+      await requestLoan(
+        parseFloat(amount), 
+        description,        
+        loanEnum,           
+        parseInt(duration)  
+      );
+
+
+      router.push('/bidding');
+    } catch (err) {
+      console.error('Loan request failed:', err);
+      toast.error('An error occurred while requesting the loan.');
+    }
+  };
 
   return (
     <motion.div
@@ -38,6 +63,7 @@ export default function RequestLoan() {
     >
       <h1 className="text-3xl font-bold mb-6">Request a Loan</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Loan Type */}
         <div>
           <Label htmlFor="loan-type">Loan Type</Label>
           <Select onValueChange={setLoanType} required>
@@ -51,6 +77,7 @@ export default function RequestLoan() {
             </SelectContent>
           </Select>
         </div>
+
         <div>
           <Label htmlFor="amount">Amount Required</Label>
           <Input
@@ -61,6 +88,8 @@ export default function RequestLoan() {
             required
           />
         </div>
+
+        {/* Loan Description */}
         <div>
           <Label htmlFor="description">Loan Description</Label>
           <Textarea
@@ -70,9 +99,22 @@ export default function RequestLoan() {
             required
           />
         </div>
-        <Button type="submit" className="w-full">Submit Loan Request</Button>
+
+        <div>
+          <Label htmlFor="duration">Duration (Months)</Label>
+          <Input
+            id="duration"
+            type="number"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            required
+          />
+        </div>
+
+        <Button type="submit" className="w-full" disabled={creatingLoan}>
+          {creatingLoan ? 'Requesting Loan...' : 'Submit Loan Request'}
+        </Button>
       </form>
     </motion.div>
-  )
+  );
 }
-

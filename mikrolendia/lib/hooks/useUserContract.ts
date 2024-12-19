@@ -104,7 +104,7 @@ const useUserContract = () => {
     city: string,
     profession: string,
     phone: string
-  ) => {
+) => {
     if (!provider) return;
 
     setIsLoading(true);
@@ -132,7 +132,8 @@ const useUserContract = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+};
+
 
   return {
     provider,

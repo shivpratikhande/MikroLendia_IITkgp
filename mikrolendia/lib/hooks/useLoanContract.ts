@@ -2,33 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { getLoanContract } from '../contract/contract';
 import { toast } from 'sonner';
+import { Loan, LoanType } from '@/types/type';
 
-enum LoanType {
-  personal = 0,
-  business = 1,
-  student = 2,
-}
 
-enum Status {
-  pending = 0,
-  accepted = 1,
-  completed = 2,
-  cancelled = 3,
-}
-
-interface Loan {
-  loanId: number;
-  amount: number;
-  description: string;
-  loanType: LoanType;
-  status: Status;
-  requester: string;
-  granter: string;
-  interest: number;
-  dueDate: number;
-  amountPaid: number;
-  duration: number;
-}
 const useLoanContract = () => {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [loanData, setLoanData] = useState<Loan[]>([]);
