@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label'
 import useLoanContract from '@/lib/hooks/useLoanContract'
 import { Loan } from '@/types/type'
+import { useAppSelector } from '@/lib/hooks/useAppSelector'
 
 
 
@@ -19,6 +20,7 @@ export default function Bidding() {
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>(loanData)  // Ensure this matches the correct type
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
   const [interestRate, setInterestRate] = useState('')
+  const { walletAddress } = useAppSelector((state) => state.wallet)
 
   // Watch for changes in searchTerm or loanData
   useEffect(() => {
@@ -40,10 +42,26 @@ export default function Bidding() {
     setSelectedLoan(loan)
   }
 
-  const submitBid = () => {
+  const submitBid = async () => {
     if (selectedLoan && interestRate) {
       // Submit the bid here
       // console.log(`Bid submitted for loan ${selectedLoan.loanId} with interest rate ${interestRate}%`)
+      const response = await fetch('http://localhost:5000/api/loan/bid', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          loanIndex: loanData.length,
+           bidBy: walletAddress,
+            bid: interestRate,
+        }),
+      });
+
+      const lund = await response.json();
+
+      console.log(lund)
+
       setSelectedLoan(null)
       setInterestRate('')
     } else {
