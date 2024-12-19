@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { toast } from 'sonner'
+import { useAppSelector } from '@/lib/hooks/useAppSelector'
 
 interface NavbarProps {
   connectWallet: () => Promise<void>
@@ -33,7 +34,8 @@ export function Navbar({
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
+
+  const { isConnected } = useAppSelector((state) => state.wallet)
 
   useEffect(() => setMounted(true), [])
   console.log(theme)
@@ -43,18 +45,33 @@ export function Navbar({
   const handleConnect = async () => {
     try {
       await connectWallet()
-      setIsConnected(true)
-      toast.success('Successfully connected to your wallet!')
+
+      if(isConnected){
+        toast.success('Successfully connected to your wallet!')
+      }
+      
     } catch (err) {
-      toast.error('Error connecting to wallet. Please try again.')
+      if(!isConnected){
+        toast.error('Error connecting to wallet. Please try again.')
+      }
       console.log(err)
     }
   }
 
   const handleDisconnect = () => {
-    disconnectWalletHandler()
-    setIsConnected(false)
-    toast.success('Successfully disconnected from your wallet!')
+    try {
+      disconnectWalletHandler()
+
+      if(!isConnected){
+        toast.success('Successfully disconnected from your wallet!')
+      }
+      
+    } catch (err) {
+      if(isConnected){
+        toast.error('Error disconnecting to wallet. Please try again.')
+      }
+      console.log(err)
+    }
   }
 
   return (
