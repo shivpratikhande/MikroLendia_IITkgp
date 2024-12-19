@@ -3,7 +3,7 @@ async function main(){
   // const [deployer]=await hre.ethers.getSigners();
   console.log("Starting")
   const Community=await hre.ethers.getContractFactory("Community");
-  const community=await Community.deploy(['0xe0AE955311088A18BeB7c52e5844d3aF5B90d804', 1]);
+  const community=await Community.deploy();
   const CommunityFactory=await hre.ethers.getContractFactory("CommunityFactory")
   console.log("deploying")
   const communityFactory=await CommunityFactory.deploy(community.target)
