@@ -23,6 +23,7 @@ const DUMMY_TRANSACTIONS = [
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview')
+
   console.log(activeTab)
 
   return (
@@ -45,10 +46,10 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Total Biddings</CardTitle>
+                <CardTitle>Total Balance</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold">7</p>
+                <p className="text-3xl font-bold">$10,500</p>
               </CardContent>
             </Card>
             <Card>

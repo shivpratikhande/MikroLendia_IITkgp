@@ -25,6 +25,7 @@ const navItems = [
   { href: '/bidding', label: 'Bidding' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/request-loan', label: 'Request Loan' },
+  { href: '/community', label: 'Community' },
 ]
 
 export function Navbar({

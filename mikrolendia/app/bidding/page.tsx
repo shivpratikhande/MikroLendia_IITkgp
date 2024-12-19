@@ -9,7 +9,18 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 
-const DUMMY_LOANS = [
+// Define a Loan type to provide better type safety
+type Loan = {
+  id: number;
+  type: string;
+  name: string;
+  amount: number;
+  description: string;
+  contactNumber: string;
+  strikes: number;
+}
+
+const DUMMY_LOANS: Loan[] = [
   { id: 1, type: 'Personal', name: 'John Doe', amount: 1000, description: 'Home renovation', contactNumber: '+1234567890', strikes: 0 },
   { id: 2, type: 'Business', name: 'Jane Smith', amount: 5000, description: 'Inventory purchase', contactNumber: '+1987654321', strikes: 1 },
   { id: 3, type: 'Student', name: 'Bob Johnson', amount: 2000, description: 'Tuition fees', contactNumber: '+1122334455', strikes: 0 },
@@ -19,8 +30,8 @@ const DUMMY_LOANS = [
 
 export default function Bidding() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredLoans, setFilteredLoans] = useState(DUMMY_LOANS)
-  const [selectedLoan, setSelectedLoan] = useState(null)
+  const [filteredLoans, setFilteredLoans] = useState<Loan[]>(DUMMY_LOANS)
+  const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
   const [interestRate, setInterestRate] = useState('')
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,15 +46,19 @@ export default function Bidding() {
     )
   }
 
-  const handleBid = (loan) => {
+  const handleBid = (loan: Loan) => {
     setSelectedLoan(loan)
   }
 
   const submitBid = () => {
-    // Here you would typically send the bid to your backend
-    console.log(`Bid submitted for loan ${selectedLoan.id} with interest rate ${interestRate}%`)
-    setSelectedLoan(null)
-    setInterestRate('')
+    if (selectedLoan && interestRate) {
+      // Here you would typically send the bid to your backend
+      console.log(`Bid submitted for loan ${selectedLoan.id} with interest rate ${interestRate}%`)
+      setSelectedLoan(null)
+      setInterestRate('')
+    } else {
+      console.error('Please select a loan and enter an interest rate before submitting the bid.')
+    }
   }
 
   return (
@@ -115,4 +130,3 @@ export default function Bidding() {
     </motion.div>
   )
 }
-
