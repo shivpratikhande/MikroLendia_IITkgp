@@ -18,4 +18,32 @@ export type Community = {
     requestor: string;
     communityId: number;
   };
+
+  export enum LoanType {
+    personal = 0,
+    business = 1,
+    student = 2,
+  }
   
+  enum Status {
+    pending = 0,
+    accepted = 1,
+    completed = 2,
+    cancelled = 3,
+  }
+  
+  
+
+  export interface Loan {
+    loanId: number;
+    amount: number;
+    description: string;
+    loanType: LoanType;
+    status: Status;
+    requester: string;
+    granter: string;
+    interest: number;
+    dueDate: number;
+    amountPaid: number;
+    duration: number;
+  }
