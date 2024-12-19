@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,14 +16,19 @@ import { Textarea } from '@/components/ui/textarea'
 
 import { toast } from 'sonner'
 import useLoanContract from '@/lib/hooks/useLoanContract'
+import { useAppSelector } from '@/lib/hooks/useAppSelector'
 
 export default function RequestLoan() {
-  const router = useRouter()
+
 
   const [loanType, setLoanType] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [duration, setDuration] = useState('');
+  const {loanData} = useLoanContract();
+
+  const { walletAddress } = useAppSelector((state) => state.wallet)
+  
 
   const { requestLoan, creatingLoan } = useLoanContract();
 
@@ -39,6 +43,7 @@ export default function RequestLoan() {
     try {
       const loanEnum = loanType === 'personal' ? 0 : loanType === 'business' ? 1 : 2;
       
+      // First, request the loan on the blockchain
       await requestLoan(
         parseFloat(amount), 
         description,        
@@ -46,8 +51,30 @@ export default function RequestLoan() {
         parseInt(duration)  
       );
 
+      // Send the data to your local server at localhost:5000
+      const response = await fetch('http://localhost:5000/api/loan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          address : walletAddress, // Make sure to use the actual wallet address
+          userLoan: parseFloat(amount),
+          loanIndex:  loanData.length 
+        }),
+      });
 
-      router.push('/bidding');
+      const lund = await response.json();
+
+      console.log(lund)
+
+      if (!response.ok) {
+        throw new Error('Failed to send data to server');
+      }
+
+      // Redirect to the bidding page on success
+      // router.push('/bidding');
+      
     } catch (err) {
       console.error('Loan request failed:', err);
       toast.error('An error occurred while requesting the loan.');
