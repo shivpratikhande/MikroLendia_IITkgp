@@ -90,7 +90,7 @@ const useLoanContract = () => {
     if (provider) {
       fetchAllLoans();
     }
-  }, [provider]); 
+  }, [fetchAllLoans, provider]); 
 
 
   const requestLoan = async (

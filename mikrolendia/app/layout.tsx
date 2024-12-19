@@ -8,7 +8,6 @@ import '@/styles/globals.css'
 import { Provider } from 'react-redux'
 import store from '@/lib/store/store'
 import {Toaster} from 'sonner'
-import LoanComponent from '@/components/LoanComponent'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,7 +31,6 @@ export default function RootLayout({
               <main className="flex-grow container mx-auto px-4 py-8">
                 {children}
                 <Toaster />
-                <LoanComponent />
               </main>
               <FooterOverlay />
             </div>
