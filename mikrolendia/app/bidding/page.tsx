@@ -43,7 +43,7 @@ export default function Bidding() {
   const submitBid = () => {
     if (selectedLoan && interestRate) {
       // Submit the bid here
-      console.log(`Bid submitted for loan ${selectedLoan.loanId} with interest rate ${interestRate}%`)
+      // console.log(`Bid submitted for loan ${selectedLoan.loanId} with interest rate ${interestRate}%`)
       setSelectedLoan(null)
       setInterestRate('')
     } else {
@@ -76,8 +76,8 @@ export default function Bidding() {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredLoans.length > 0 ? (
-          filteredLoans.map((loan) => (
-            <Card key={loan.loanId}>
+          filteredLoans.map((loan , index) => (
+            <Card key={index}>
               <CardHeader>
                 <CardTitle>{loan.loanType} Loan</CardTitle>
                 <CardDescription>{loan.requester}</CardDescription>
