@@ -1,34 +1,47 @@
 'use client'
-
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useAppSelector } from '@/lib/hooks/useAppSelector'
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAppSelector } from '@/lib/hooks/useAppSelector';
+import { toast } from 'sonner';
+import useUserContract from '@/lib/hooks/useUserContract';
 
 export default function Register() {
-  const [name, setName] = useState('')
-  const [age, setAge] = useState('')
-  const [city, setCity] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [profession, setProfession] = useState('')
-  const [metamaskAddress, setMetamaskAddress] = useState<string | null>('')
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [city, setCity] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [profession, setProfession] = useState('');
+  const [metamaskAddress, setMetamaskAddress] = useState<string | null>('');
   const walletAddress = useAppSelector((state) => state.wallet.walletAddress);
-  const isConnected = useAppSelector((state) => state.wallet.isConnected);
-  useEffect(() => {
-    // Simulating getting the Metamask address
-    // In a real application, you would use the actual Metamask API
-    setMetamaskAddress(walletAddress)
-  }, [walletAddress])
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-    // Here you would typically send the registration data to your backend
-    console.log({ name, age, city, phoneNumber, profession, metamaskAddress })
-  }
+  const { addUser, isLoading } = useUserContract();
+
+  useEffect(() => {
+    setMetamaskAddress(walletAddress);
+  }, [walletAddress]);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!name || !age || !city || !phoneNumber || !profession || !metamaskAddress) {
+      toast.error('Please fill in all the fields.');
+      return;
+    }
+
+
+    try {
+      await addUser(name, parseInt(age), city, profession, phoneNumber);
+      toast.success('Registration successful!');
+    } catch (err) {
+      console.error('Registration failed:', err);
+      toast.error('An error occurred during registration.');
+    }
+  };
 
   return (
     <motion.div
@@ -38,12 +51,13 @@ export default function Register() {
       className="container mx-auto px-4 py-8"
     >
       <Card className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
           <CardDescription>Join MikroLendia and start your micro-lending journey</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -104,18 +118,20 @@ export default function Register() {
               <Label htmlFor="metamask-address">Metamask Address</Label>
               <Input
                 id="metamask-address"
-                value={metamaskAddress? metamaskAddress:""}
+                value={metamaskAddress ? metamaskAddress : ''}
                 readOnly
                 className="bg-muted"
               />
             </div>
-          </form>
+          
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">Register</Button>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Registering...' : 'Register'}
+          </Button>
         </CardFooter>
+        </form>
       </Card>
     </motion.div>
-  )
+  );
 }
-
