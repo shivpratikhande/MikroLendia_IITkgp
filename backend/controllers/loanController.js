@@ -110,8 +110,9 @@ exports.getUserApprovedBids = async (req, res) => {
 
 exports.bid = async (req, res) => {
   try {
-    const { loanId, bidBy, bid } = req.body;
-    const loan = await Loan.findById(loanId);
+    const { loanIndex, bidBy, bid } = req.body;
+    const loan = await Loan.findOne({loanIndex});
+    console.log(loan)
     if (!loan) {
       return res.status(404).json({ message: "Loan not found" });
     }
@@ -120,34 +121,39 @@ exports.bid = async (req, res) => {
 
     const newBid = {
       bidBy,
-      paidAmount,
+      paidAmount :0,
       returnOnLoan,
       bidAt: moment().toDate(),
       status: "pending",
       interest: bid
     };
+    console.log(loan)
+    console.log(Array.isArray(loan.bids))
+    console.log(loan.bids)
 
     loan.bids.push(newBid);
+    // loan.bids[loan.bids.length] = newBid
     loan.bidCount++;
     loan.returnOnLoan = returnOnLoan;
     loan.totalLoanValue = totalLoanValue;
 
     // Add updated percentage to percentageHistory
-    loan.percentageHistory.push(updatedPercentage);
+    // loan.percentageHistory.push(updatedPercentage);
 
     const savedLoan = await loan.save();
 
     res.json({
       message: `Bid placed successfully.`,
-      paidAmount: paidAmount.toFixed(2),
-      currentPercentage: updatedPercentage.toFixed(2),
-      returnOnLoan: returnOnLoan.toFixed(2),
-      demand: loan.buyDemand.toFixed(2),
-      totalLoanValue: totalLoanValue.toFixed(2),
-      bidCount: loan.bidCount,
-      loan: savedLoan,
+      // paidAmount: 0,
+      // currentPercentage: updatedPercentage.toFixed(2),
+      // returnOnLoan: returnOnLoan.toFixed(2),
+      // demand: loan.buyDemand.toFixed(2),
+      // totalLoanValue: totalLoanValue.toFixed(2),
+      // bidCount: loan.bidCount,
+      // loan: savedLoan,
     });
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: "Error placing bid", error: err });
   }
 };
