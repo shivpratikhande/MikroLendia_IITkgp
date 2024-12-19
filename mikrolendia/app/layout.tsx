@@ -1,15 +1,14 @@
+'use client' 
+
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
-import { Navbar } from '@/components/navbar'
+import { NavbarWrapper } from '@/components/navbar-wrapper' 
 import { FooterOverlay } from '@/components/footer-overlay'
 import '@/styles/globals.css'
+import { Provider } from 'react-redux'
+import store from '@/lib/store/store'
 
 const inter = Inter({ subsets: ['latin'] })
-
-export const metadata = {
-  title: 'MikroLendia',
-  description: 'Micro loans lending platform',
-}
 
 export default function RootLayout({
   children,
@@ -25,16 +24,17 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow container mx-auto px-4 py-8">
-              {children}
-            </main>
-            <FooterOverlay />
-          </div>
+          <Provider store={store}>
+            <div className="flex flex-col min-h-screen">
+              <NavbarWrapper />
+              <main className="flex-grow container mx-auto px-4 py-8">
+                {children}
+              </main>
+              <FooterOverlay />
+            </div>
+          </Provider>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-

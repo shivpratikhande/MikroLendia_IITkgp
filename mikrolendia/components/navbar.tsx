@@ -14,33 +14,44 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 
+interface NavbarProps {
+  connectWallet: () => Promise<void>
+  disconnectWalletHandler: () => void
+}
+
 const navItems = [
   { href: '/bidding', label: 'Bidding' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/request-loan', label: 'Request Loan' },
 ]
 
-export function Navbar() {
+export function Navbar({
+  connectWallet,
+  disconnectWalletHandler,
+}: NavbarProps) {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => setMounted(true), [])
+  console.log(theme)
 
   if (!mounted) return null
 
-  const handleConnect = () => {
-    // Simulating wallet connection
-    setTimeout(() => {
-      setIsConnected(true)
-    }, 1000)
+  const handleConnect = async () => {
+    await connectWallet()  
+    setIsConnected(true)   
   }
-  console.log(theme)
+
+  const handleDisconnect = () => {
+    disconnectWalletHandler() 
+    setIsConnected(false)     
+  }
 
   return (
     <motion.nav 
-      className="sticky top-0 z-40 w-full  backdrop-blur "
+      className="sticky top-0 z-40 w-full backdrop-blur"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -49,12 +60,12 @@ export function Navbar() {
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
             <motion.span 
-              className=" text-2xl font-bold flex items-center"
+              className="text-2xl font-bold flex items-center"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             >
-              <Image src="/logo.png" width={40} height={40} alt="MikroLendia Logo"  />
+              <Image src="/logo.png" width={40} height={40} alt="MikroLendia Logo" />
               <div className='ml-3'>MikroLendia</div>
             </motion.span>
           </Link>
@@ -99,9 +110,16 @@ export function Navbar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={handleConnect} disabled={isConnected}>
-            {isConnected ? 'Connected' : 'Connect Wallet'}
-          </Button>
+          {!isConnected && (
+              <Button onClick={handleConnect} disabled={isConnected}>
+                Connect Wallet
+              </Button>
+          )}
+          {isConnected && (
+            <Button onClick={handleDisconnect} variant="outline" size="sm">
+              Disconnect Wallet
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -144,4 +162,3 @@ export function Navbar() {
     </motion.nav>
   )
 }
-
