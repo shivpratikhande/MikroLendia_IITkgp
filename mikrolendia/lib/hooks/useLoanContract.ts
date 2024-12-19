@@ -29,7 +29,6 @@ interface Loan {
   amountPaid: number;
   duration: number;
 }
-
 const useLoanContract = () => {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [loanData, setLoanData] = useState<Loan[]>([]);
@@ -54,24 +53,22 @@ const useLoanContract = () => {
 
   const fetchAllLoans = useCallback(async () => {
     if (!provider) return;
-
+    console.log('yayay')
     setIsLoading(true);
     setError(null);
 
     try {
       const contract = getLoanContract(provider);
-      const loanCount = await contract.totalLoans();
-      const loansPromises = [];
-
-      for (let i = 0; i < loanCount.toNumber(); i++) {
-        loansPromises.push(contract.Loans(i));
-      }
-
-
-      const loans = await Promise.all(loansPromises);
+      console.log(contract)
+      const loans = await contract.getAllLoans();
+      console.log(loans)
+      const loanCount=loans.length
+      console.log(loanCount)
+      console.log(loans)
       setLoanData(loans);
       console.log('Fetched all loans:', loans);
     } catch (err: unknown) {
+      console.log(err)
       if (err instanceof Error) {
         console.error('Error fetching loans:', err.message);
         setError('Failed to fetch loan data');
@@ -88,6 +85,7 @@ const useLoanContract = () => {
 
   useEffect(() => {
     if (provider) {
+      console.log("fetching")
       fetchAllLoans();
     }
   }, [fetchAllLoans, provider]); 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import useLoanContract from '@/lib/hooks/useLoanContract'
 
 // Define a Loan type to provide better type safety
 type Loan = {
@@ -29,6 +30,10 @@ const DUMMY_LOANS: Loan[] = [
 ]
 
 export default function Bidding() {
+  const {loanData}=useLoanContract()
+  useEffect(()=>{
+    console.log(loanData)
+  }, [loanData])
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>(DUMMY_LOANS)
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)

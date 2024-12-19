@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAppSelector } from '@/lib/hooks/useAppSelector'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -14,13 +15,14 @@ export default function Register() {
   const [city, setCity] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [profession, setProfession] = useState('')
-  const [metamaskAddress, setMetamaskAddress] = useState('')
-
+  const [metamaskAddress, setMetamaskAddress] = useState<string | null>('')
+  const walletAddress = useAppSelector((state) => state.wallet.walletAddress);
+  const isConnected = useAppSelector((state) => state.wallet.isConnected);
   useEffect(() => {
     // Simulating getting the Metamask address
     // In a real application, you would use the actual Metamask API
-    setMetamaskAddress('0x1234...5678')
-  }, [])
+    setMetamaskAddress(walletAddress)
+  }, [walletAddress])
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
@@ -102,7 +104,7 @@ export default function Register() {
               <Label htmlFor="metamask-address">Metamask Address</Label>
               <Input
                 id="metamask-address"
-                value={metamaskAddress}
+                value={metamaskAddress? metamaskAddress:""}
                 readOnly
                 className="bg-muted"
               />
