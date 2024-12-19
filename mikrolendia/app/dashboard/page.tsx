@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import useLoanContract from '@/lib/hooks/useLoanContract'
+import { Loan } from '@/types/type'
+import { useAppSelector } from '@/lib/hooks/useAppSelector'
 
 
 const DUMMY_BIDS = [
@@ -20,7 +22,34 @@ const DUMMY_TRANSACTIONS = [
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview')
-  const {userLoanData} = useLoanContract();
+
+
+  // const {userLoanData} = useLoanContract();
+
+  const [userLoanData , setUserLoanData] = useState<Loan[]>([]);
+  const { walletAddress } = useAppSelector((state) => state.wallet)
+
+
+  useEffect(() => {
+
+    async function fetchData () {
+      const response = await fetch(`http://localhost:5000/api/loan/${walletAddress}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    
+      const lund = await response.json();
+      console.log(lund)
+      setUserLoanData(lund)
+    }
+
+
+    fetchData()
+  }, [walletAddress])
+
+
 
   console.log(activeTab)
 
@@ -35,8 +64,8 @@ export default function Dashboard() {
       <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
         <TabsList>
           {/* <TabsTrigger value="overview">Overview</TabsTrigger> */}
-          {/* {/* <TabsTrigger value="requested-loans">Requested Loans</TabsTrigger> */}
-          <TabsTrigger value="my-bids">My Bids</TabsTrigger>
+          <TabsTrigger value="requested-loans">Requested Loans</TabsTrigger>
+          {/* <TabsTrigger value="my-bids">My Bids</TabsTrigger> */}
           {/* <TabsTrigger value="transactions">Transactions</TabsTrigger>  */}
         </TabsList>
 
@@ -75,9 +104,17 @@ export default function Dashboard() {
               <Card key={Number(index)}>
                 <CardHeader>
                   <CardTitle>{loan.description} Loan</CardTitle>
-                  <CardDescription>${Number(loan.amount)}</CardDescription>
+                  <CardDescription>${Number(loan.loan)}</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {
+                    loan.bids.map((bid , index)=>{
+                      return <div key={index} className='flex font-bold'>
+                        <h1 className='mr-10'>{bid.interest}</h1>
+                        <h1>{bid.bidBy}</h1>
+                      </div>
+                    })
+                  }
                   {loan.typeOfLoan == 0 ? "business" : loan.typeOfLoan == 1 ? "student" : "personal"}
                 </CardContent>
               </Card>
