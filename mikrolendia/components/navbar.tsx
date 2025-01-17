@@ -26,6 +26,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/request-loan', label: 'Request Loan' },
   { href: '/community', label: 'Community' },
+  { href: '/register', label: 'Register' },
 ]
 
 export function Navbar({
@@ -91,8 +92,8 @@ export function Navbar({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             >
-              <Image src="/logo.png" width={40} height={40} alt="MikroLendia Logo" />
-              <div className='ml-3'>MikroLendia</div>
+              <Image src="/logo.png" width={40} height={40} alt="VikasLend Logo" />
+              <div className='ml-3'>VikasLend</div>
             </motion.span>
           </Link>
         </div>

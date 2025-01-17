@@ -11,11 +11,12 @@ import { Label } from '@/components/ui/label'
 import useLoanContract from '@/lib/hooks/useLoanContract'
 import { Loan } from '@/types/type'
 import { useAppSelector } from '@/lib/hooks/useAppSelector'
+import { ethers } from 'ethers'
 
 
 
 export default function Bidding() {
-  const { loanData, isLoading, error } = useLoanContract()  // Get loan data from the custom hook
+  const { loanData, isLoading, error, bidMoney } = useLoanContract()  // Get loan data from the custom hook
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>(loanData)  // Ensure this matches the correct type
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
@@ -32,7 +33,16 @@ export default function Bidding() {
       )
     )
   }, [searchTerm, loanData])
-
+  async function getEthPriceInINR() {
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=inr');
+      const data = await response.json();
+      return data.ethereum.inr; // Return the ETH price in INR
+    } catch (error) {
+      console.error('Error fetching ETH price:', error);
+      throw new Error('Unable to fetch ETH price');
+    }
+  }
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value.toLowerCase()
     setSearchTerm(term)
@@ -43,16 +53,18 @@ export default function Bidding() {
   }
 
   const submitBid = async () => {
-    if (selectedLoan && interestRate) {
-      // Submit the bid here
-      // console.log(`Bid submitted for loan ${selectedLoan.loanId} with interest rate ${interestRate}%`)
-      const response = await fetch('http://localhost:5000/api/loan/bid', {
+    if (selectedLoan && interestRate && walletAddress) {
+      // Convert INR amount to ETH
+      const ethAmount = selectedLoan.amount/Math.pow(10,18)
+      const amount=ethers.utils.parseEther((ethAmount).toString());
+      await bidMoney(amount)
+      const response = await fetch('http://localhost:5001/api/loan/bid', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          loanIndex: loanData.length,
+          loanIndex: Number(selectedLoan.loanId),
            bidBy: walletAddress,
             bid: interestRate,
         }),
@@ -102,7 +114,7 @@ export default function Bidding() {
               </CardHeader>
               <CardContent>
                 {/* Convert BigNumber amount to string */}
-                <p className="font-semibold mb-2">${loan.amount.toString()}</p>
+                <p className="font-semibold mb-2">{loan.amount/Math.pow(10,18)}ETH</p>
                 <p className="text-sm mb-2">{loan.description}</p>
                 <Badge >
                   Strikes: 1

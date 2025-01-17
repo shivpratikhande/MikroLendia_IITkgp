@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -10,7 +10,9 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { Community, LoanRequest } from '@/types/type'
 import CommunityCard from '@/components/community-card'
-
+import { ethers } from 'ethers'
+import CommunityABI from "../../lib/contract/config/CommunityAbi.json"
+import useCommunityFactory from '@/lib/hooks/useCommunityFactoryContract'
 const initialCommunities: Community[] = [
   { id: 1, name: 'Small Business Boost', description: 'Supporting local entrepreneurs', funds: 50000, members: 1200, joined: false, interestRate: 5 },
   { id: 2, name: 'Tech Startups United', description: 'Fueling innovation in tech', funds: 75000, members: 800, joined: true, interestRate: 7 },
@@ -29,31 +31,35 @@ export default function Community() {
   const [newCommunityName, setNewCommunityName] = useState('')
   const [newCommunityDescription, setNewCommunityDescription] = useState('')
   const [newCommunityInterestRate, setNewCommunityInterestRate] = useState('')
+  const [newCommunityRequiredSignatures, setNewCommunityRequiredSignatures] = useState('')
   const [showNewCommunityDialog, setShowNewCommunityDialog] = useState(false)
-
+  const [owners, setOwners]=useState<[string]>([''])
   const joinedCommunities = communities.filter(c => c.joined)
-
+const {deployCommunity, allCommunities, userCommunities}=useCommunityFactory()
+useEffect(()=>{
+  console.log(allCommunities)
+}, [allCommunities])
   const handleJoin = (communityId: number) => {
     setCommunities(communities.map(c => 
       c.id === communityId ? { ...c, joined: true } : c
     ))
   }
-
-  const handleCreateCommunity = () => {
-    const newCommunity: Community = {
-      id: communities.length + 1,
-      name: newCommunityName,
-      description: newCommunityDescription,
-      funds: 0,
-      members: 1,
-      joined: true,
-      interestRate: parseFloat(newCommunityInterestRate)
+  const handleOwnerChange = (index:  number, event: { target: { value: any } }) => {
+    const newOwners = [...owners];
+    newOwners[index] = event.target.value;
+    setOwners(newOwners);
+  };
+  const addOwnerField = () => {
+    setOwners([...owners, ""]);
+  };
+  const handleCreateCommunity = async() => {
+    try{
+      const initData=new ethers.utils.Interface(CommunityABI).encodeFunctionData("initialize", [owners, newCommunityRequiredSignatures, newCommunityName, newCommunityInterestRate]);
+      await deployCommunity(initData, owners, newCommunityName)
     }
-    setCommunities([...communities, newCommunity])
-    setShowNewCommunityDialog(false)
-    setNewCommunityName('')
-    setNewCommunityDescription('')
-    setNewCommunityInterestRate('')
+    catch(err: any){
+      console.log(err)
+    };
   }
 
   const handleLoanRequest = (communityId: number, loanType: string, amount: number, description: string) => {
@@ -144,15 +150,23 @@ export default function Community() {
                 placeholder="Enter community name"
               />
             </div>
-            <div>
-              <Label htmlFor="community-description">Description</Label>
-              <Textarea
-                id="community-description"
-                value={newCommunityDescription}
-                onChange={(e) => setNewCommunityDescription(e.target.value)}
-                placeholder="Describe the community's purpose"
-              />
-            </div>
+            
+              <Label htmlFor="community-owners">Community Owners</Label>
+            {owners.map((owner, index) => (
+              <div id="community-owners">
+
+                <Input
+                  id={`${index}`}
+                  type="text"
+                  placeholder={`Owner ${index + 1} Address`}
+                  value={owner}
+                  onChange={(e) => handleOwnerChange(index, e)}
+                  />
+                  </div>
+              ))}
+              <Button onClick={addOwnerField} className={"w-full "}>
+                Add Owner
+              </Button>
             <div>
               <Label htmlFor="community-interest-rate">Fixed Loan Interest Rate (%)</Label>
               <Input
@@ -161,6 +175,16 @@ export default function Community() {
                 value={newCommunityInterestRate}
                 onChange={(e) => setNewCommunityInterestRate(e.target.value)}
                 placeholder="Enter interest rate"
+              />
+            </div>
+            <div>
+              <Label htmlFor="community-required-signatures">Required Signatures</Label>
+              <Input
+                id="community-required-signatures"
+                type="number"
+                value={newCommunityRequiredSignatures}
+                onChange={(e) => setNewCommunityRequiredSignatures(e.target.value)}
+                placeholder="Enter number of signatures required"
               />
             </div>
           </div>
@@ -172,5 +196,3 @@ export default function Community() {
     </motion.div>
   )
 }
-
-
