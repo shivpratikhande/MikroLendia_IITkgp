@@ -1,97 +1,162 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { Community, LoanRequest } from '@/types/type'
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Community, LoanRequest } from "@/types/type";
+import useCommunity from "@/lib/hooks/useCommunityContract";
+import { useAppSelector } from "@/lib/hooks/useAppSelector";
 
 function CommunityCard({
-    community,
-    onJoin,
-    onLoanRequest,
-    loanRequests,
-    onApproveLoan
-  }: {
-    community: Community
-    onJoin: (id: number) => void
-    onLoanRequest: (communityId: number, loanType: string, amount: number, description: string) => void
-    loanRequests: LoanRequest[]
-    onApproveLoan: (loanId: number) => void
-  }) {
-    const [showDetails, setShowDetails] = useState(false)
-    const [showLoanRequestDialog, setShowLoanRequestDialog] = useState(false)
-    const [loanType, setLoanType] = useState('')
-    const [loanAmount, setLoanAmount] = useState('')
-    const [loanDescription, setLoanDescription] = useState('')
-  
-    const handleLoanRequest = (event: React.FormEvent) => {
-      event.preventDefault()
-      onLoanRequest(community.id, loanType, parseFloat(loanAmount), loanDescription)
-      setShowLoanRequestDialog(false)
-      setLoanType('')
-      setLoanAmount('')
-      setLoanDescription('')
-    }
+  community,
+  joined,
+  onJoin,
+  onLoanRequest,
+  loanRequests,
+  onApproveLoan,
+}: {
+  community: Community;
+  onJoin: (id: number) => void;
+  joined: boolean
+  onLoanRequest: (
+    communityId: number,
+    loanType: string,
+    amount: number,
+    description: string
+  ) => void;
+  loanRequests: LoanRequest[];
+  onApproveLoan: (loanId: number) => void;
+}) {
+  const [showDetails, setShowDetails] = useState(false);
+  const [showLoanRequestDialog, setShowLoanRequestDialog] = useState(false);
+  const [loanType, setLoanType] = useState("");
+  const [loanAmount, setLoanAmount] = useState("");
+  const [loanDescription, setLoanDescription] = useState("");
+  const {
+    balance,
+    fetchBalance,
+    fetchInterest,
+    interestRate,
+    provider,
+    contract,
+  } = useCommunity(community.contractAddress);
+  console.log(joined)
+  const {walletAddress}=useAppSelector((state) => state.wallet);
+  const handleLoanRequest = (event: React.FormEvent) => {
+    event.preventDefault();
+    onLoanRequest(
+      community.id,
+      loanType,
+      parseFloat(loanAmount),
+      loanDescription
+    );
+    setShowLoanRequestDialog(false);
+    setLoanType("");
+    setLoanAmount("");
+    setLoanDescription("");
+  };
+  useEffect(() => {
+    fetchBalance();
+    fetchInterest();
+  }), [contract, provider, walletAddress];
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>{community.name}</CardTitle>
-        <CardDescription>{community.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex justify-between mb-2">
           <span>Available Funds:</span>
-          <span className="font-semibold">${community.funds.toLocaleString()}</span>
+          <span className="font-semibold">{balance?.toLocaleString()} ETH</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Members:</span>
-          <span className="font-semibold">{community.members.toLocaleString()}</span>
+          <span className="font-semibold">{community?.owners?.length}</span>
         </div>
         <div className="flex justify-between mb-4">
           <span>Interest Rate:</span>
-          <span className="font-semibold">{community.interestRate}%</span>
+          <span className="font-semibold">{interestRate?.toString()}%</span>
         </div>
-        {showDetails && community.joined && (
+        {showDetails && joined && (
           <div className="mt-4">
             <h4 className="font-semibold mb-2">Active Loan Requests</h4>
             {loanRequests.map((loan) => (
               <Card key={loan.id} className="mb-4 p-4">
                 <h5 className="font-medium">{loan.title}</h5>
-                <p className="text-sm text-muted-foreground mb-1">{loan.description}</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {loan.description}
+                </p>
                 <p className="text-sm mb-2">Requestor: {loan.requestor}</p>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm">Amount: ${loan.amount}</span>
-                  <Badge variant="secondary">{loan.approvals}/{loan.totalVotes} Approvals</Badge>
+                  <Badge variant="secondary">
+                    {loan.approvals}/{loan.totalVotes} Approvals
+                  </Badge>
                 </div>
-                <Progress value={(loan.approvals / loan.totalVotes) * 100} className="mb-2" />
-                <Button onClick={() => onApproveLoan(loan.id)} size="sm">Approve Loan</Button>
+                <Progress
+                  value={(loan.approvals / loan.totalVotes) * 100}
+                  className="mb-2"
+                />
+                <Button onClick={() => onApproveLoan(loan.id)} size="sm">
+                  Approve Loan
+                </Button>
               </Card>
             ))}
-            <Button onClick={() => setShowLoanRequestDialog(true)} className="w-full mt-4">Request a Loan</Button>
+            <Button
+              onClick={() => setShowLoanRequestDialog(true)}
+              className="w-full mt-4"
+            >
+              Request a Loan
+            </Button>
           </div>
         )}
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={() => setShowDetails(!showDetails)}>
-          {showDetails ? 'Hide Details' : 'Show Details'}
+          {showDetails ? "Hide Details" : "Show Details"}
         </Button>
         {!community.joined && (
           <Button onClick={() => onJoin(community.id)}>Join Community</Button>
         )}
       </CardFooter>
 
-      <Dialog open={showLoanRequestDialog} onOpenChange={setShowLoanRequestDialog}>
+      <Dialog
+        open={showLoanRequestDialog}
+        onOpenChange={setShowLoanRequestDialog}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Request a Loan</DialogTitle>
-            <DialogDescription>Fill out the details to request a loan from this community.</DialogDescription>
+            <DialogDescription>
+              Fill out the details to request a loan from this community.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleLoanRequest} className="space-y-4">
             <div>
@@ -133,7 +198,7 @@ function CommunityCard({
         </DialogContent>
       </Dialog>
     </Card>
-  )
+  );
 }
 
-export default CommunityCard
+export default CommunityCard;

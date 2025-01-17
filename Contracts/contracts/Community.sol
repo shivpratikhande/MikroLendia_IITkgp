@@ -120,6 +120,9 @@ contract Community is Initializable {
     function getRequiredSignatures() public view returns(uint256) {
         return _requiredSignatures;
     }
+    function getFixedInterestRate() public view returns(uint256) {
+        return fixedInterest;
+    }
 
     function isAllAddress(address[] memory newOwners) pure private returns(bool) {
         for(uint256 i = 0; i < newOwners.length; i++) {

@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Contract, ethers, providers } from "ethers";
 import { getCommunityContract } from "../contract/contract";
 
-const useCommunity = (communityAddress: String) => {
+const useCommunity = (communityAddress: string) => {
   const [contract, setContract] = useState<Contract | null>(null);
   const [owners, setOwners] = useState<[String]|[]>([]);
   const [requiredSignatures, setRequiredSignatures] = useState(0);
   const [userAddress, setUserAddress] = useState<String | null>(null);
   const [provider, setProvider]=useState<ethers.providers.Web3Provider | null>(null)
+  const [balance, setBalance]=useState<Number>(0)
+  const [interestRate, setInterestRate]=useState<Number>(0)
+
   // Initialize provider and contract
   useEffect(() => {
     const initialize = async () => {
@@ -58,7 +61,26 @@ const useCommunity = (communityAddress: String) => {
     if (!contract) throw new Error("Contract is not initialized");
     return await contract.isOwner(address);
   };
+  const fetchBalance=useCallback(()=>{
+    const getBalance=async()=>{
+      if(communityAddress && provider){
+        const bal=await provider?.getBalance(communityAddress);
+        return setBalance(Number(bal))
+      }
+    }
+    getBalance();
+  }, [provider, communityAddress])
 
+  const fetchInterest=useCallback(()=>{
+    const getInterest=async()=>{
+      if(!contract) throw new Error("Contract is not initialized");
+      if(communityAddress && provider){
+        const interest=await contract.getFixedInterestRate();
+        return setInterestRate(Number(interest))
+      }
+    }
+    getInterest();
+  }, [provider, contract, communityAddress])
   const addSignatureToTransaction = async (to: String, value: Number) => {
     if (!userAddress) throw new Error("User address not detected");
     const messageHash = ethers.utils.solidityKeccak256(["address", "uint256", "string"], [to, ethers.utils.parseEther(value.toString()), ""]);
@@ -78,6 +100,11 @@ const useCommunity = (communityAddress: String) => {
     changeLoanContract,
     verifyOwner,
     addSignatureToTransaction,
+    fetchBalance,
+    fetchInterest,
+    balance,
+    interestRate,
+    provider
   };
 };
 

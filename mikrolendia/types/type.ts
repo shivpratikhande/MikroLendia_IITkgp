@@ -6,6 +6,8 @@ export type Community = {
   members: number;
   joined: boolean;
   interestRate: number;
+  contractAddress: string;
+  owners: [string];
 };
 
 export type LoanRequest = {
