@@ -2,24 +2,31 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-
+import "./LoanContract.sol";
 contract Community is Initializable {
     uint256 private _requiredSignatures;
     address[] private _owners;
-    string photoUrl;
+    string name;
+    uint256 fixedInterest;
     event TransactionExecuted(uint256 transactionId, address executer);
     event ReceivedEth(uint256 amount);
+    LoanContract loan=LoanContract(0x0D9fB0f68cDCdeEB323411230Ac03ADeA20B3515);
 
-    function initialize(address[] memory owners, uint256 requiredSignatures, string memory url) public initializer {
+
+    function changeLoanContract(address newContract) public{
+        loan = LoanContract(newContract);
+    }
+
+    function initialize(address[] memory owners, uint256 requiredSignatures, string memory _name, uint256 _fixedInterest) public initializer {
         require(owners.length > 0, "At least one owner required");
         require(requiredSignatures > 0 && requiredSignatures <= owners.length, "Invalid number of required signatures");
         require(isAllAddress(owners), "Invalid owner addresses");
 
         _owners = owners;
         _requiredSignatures = requiredSignatures;
-        photoUrl = url;
+        name = _name;
+        fixedInterest = _fixedInterest;
     }
-    
     function getMessageHash(
         address _to,
         uint256 _amount,
@@ -83,6 +90,7 @@ contract Community is Initializable {
         }
         require(numberOfSignatures>=getRequiredSignatures(),"Not enough signatures");
         (bool success,) = to.call{value: value}("");
+        loan.addCommunityLoan(value, fixedInterest, payable(address(this)));
         require(success, "Transaction execution failed");
     }
 

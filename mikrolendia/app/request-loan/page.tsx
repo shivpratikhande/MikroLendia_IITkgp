@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import useLoanContract from '@/lib/hooks/useLoanContract'
 import { useAppSelector } from '@/lib/hooks/useAppSelector'
+import { ethers } from 'ethers'
 
 export default function RequestLoan() {
 
@@ -31,7 +32,16 @@ export default function RequestLoan() {
   
 
   const { requestLoan, creatingLoan } = useLoanContract();
-
+  async function getEthPriceInINR() {
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=inr');
+      const data = await response.json();
+      return data.ethereum.inr; // Return the ETH price in INR
+    } catch (error) {
+      console.error('Error fetching ETH price:', error);
+      throw new Error('Unable to fetch ETH price');
+    }
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -44,15 +54,19 @@ export default function RequestLoan() {
       const loanEnum = loanType === 'personal' ? 0 : loanType === 'business' ? 1 : 2;
       
       // First, request the loan on the blockchain
+      const ethPriceInINR = await getEthPriceInINR();
+      const ethAmount = parseFloat(amount) / ethPriceInINR;
+      const loanAmount=ethers.utils.parseUnits(ethAmount.toString())
+      console.log(loanAmount)
       await requestLoan(
-        parseFloat(amount), 
+        loanAmount,
         description,        
         loanEnum,           
         parseInt(duration)  
       );
 
       // Send the data to your local server at localhost:5000
-      const response = await fetch('http://localhost:5000/api/loan', {
+      const response = await fetch('http://localhost:5001/api/loan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

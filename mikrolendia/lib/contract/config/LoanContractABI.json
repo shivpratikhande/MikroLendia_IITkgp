@@ -2,6 +2,54 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_loanId",
+				"type": "uint256"
+			}
+		],
+		"name": "addStrikeIfLate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_loanId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_interest",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_granter",
+				"type": "address"
+			},
+			{
+				"internalType": "address[]",
+				"name": "_bidderAddresses",
+				"type": "address[]"
+			}
+		],
+		"name": "approveLoan",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "_userContractAddress",
 				"type": "address"
@@ -71,327 +119,41 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "Loans",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "loanId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "enum LoanContract.LoanType",
-				"name": "typeOfLoan",
-				"type": "uint8"
-			},
-			{
-				"internalType": "enum LoanContract.Status",
-				"name": "status",
-				"type": "uint8"
-			},
-			{
-				"internalType": "address",
-				"name": "requester",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "granter",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "interest",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "dueDate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amountPaid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "duration",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "UserApprovedLoans",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "loanId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "enum LoanContract.LoanType",
-				"name": "typeOfLoan",
-				"type": "uint8"
-			},
-			{
-				"internalType": "enum LoanContract.Status",
-				"name": "status",
-				"type": "uint8"
-			},
-			{
-				"internalType": "address",
-				"name": "requester",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "granter",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "interest",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "dueDate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amountPaid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "duration",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "UserPaidLoans",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "loanId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "enum LoanContract.LoanType",
-				"name": "typeOfLoan",
-				"type": "uint8"
-			},
-			{
-				"internalType": "enum LoanContract.Status",
-				"name": "status",
-				"type": "uint8"
-			},
-			{
-				"internalType": "address",
-				"name": "requester",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "granter",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "interest",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "dueDate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amountPaid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "duration",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "UserRequestedLoans",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "loanId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "enum LoanContract.LoanType",
-				"name": "typeOfLoan",
-				"type": "uint8"
-			},
-			{
-				"internalType": "enum LoanContract.Status",
-				"name": "status",
-				"type": "uint8"
-			},
-			{
-				"internalType": "address",
-				"name": "requester",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "granter",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "interest",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "dueDate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amountPaid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "duration",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
 				"name": "_loanId",
 				"type": "uint256"
 			}
 		],
-		"name": "addStrikeIfLate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_loanId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_interest",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_granter",
-				"type": "address"
-			}
-		],
-		"name": "approveLoan",
+		"name": "repayLoan",
 		"outputs": [],
 		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "enum LoanContract.LoanType",
+				"name": "_type",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_duration",
+				"type": "uint256"
+			}
+		],
+		"name": "requestLoan",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -772,41 +534,291 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_loanId",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "repayLoan",
-		"outputs": [],
-		"stateMutability": "payable",
+		"name": "Loans",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "loanId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "enum LoanContract.LoanType",
+				"name": "typeOfLoan",
+				"type": "uint8"
+			},
+			{
+				"internalType": "enum LoanContract.Status",
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "requester",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "granter",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "interest",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dueDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amountPaid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
 				"internalType": "uint256",
-				"name": "_amount",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "UserApprovedLoans",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "loanId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
 				"type": "uint256"
 			},
 			{
 				"internalType": "string",
-				"name": "_description",
+				"name": "description",
 				"type": "string"
 			},
 			{
 				"internalType": "enum LoanContract.LoanType",
-				"name": "_type",
+				"name": "typeOfLoan",
 				"type": "uint8"
 			},
 			{
+				"internalType": "enum LoanContract.Status",
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "requester",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "granter",
+				"type": "address"
+			},
+			{
 				"internalType": "uint256",
-				"name": "_duration",
+				"name": "interest",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dueDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amountPaid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
 				"type": "uint256"
 			}
 		],
-		"name": "requestLoan",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "UserPaidLoans",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "loanId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "enum LoanContract.LoanType",
+				"name": "typeOfLoan",
+				"type": "uint8"
+			},
+			{
+				"internalType": "enum LoanContract.Status",
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "requester",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "granter",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "interest",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dueDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amountPaid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "UserRequestedLoans",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "loanId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "enum LoanContract.LoanType",
+				"name": "typeOfLoan",
+				"type": "uint8"
+			},
+			{
+				"internalType": "enum LoanContract.Status",
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "requester",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "granter",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "interest",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dueDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amountPaid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "duration",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]
